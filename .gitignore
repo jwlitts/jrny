@@ -1,0 +1,5 @@
+*.exe
+*.jrnl
+.vscode
+jounrey
+*.log
