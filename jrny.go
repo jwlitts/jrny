@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -164,6 +165,10 @@ func max(a, b int) int {
 }
 
 func main() {
+	printMode := flag.Bool("l", false, "print journal then exit")
+	appendMode := flag.String("a", "", "append to journal")
+	args := flag.Args()
+	flag.Parse()
 	logf, err := os.OpenFile("journey.log", os.O_APPEND|os.O_CREATE, os.ModePerm)
 	if err == nil {
 		defer logf.Close()
@@ -171,8 +176,8 @@ func main() {
 	}
 	log.Println("Starting")
 	journalfile := "journal.jrnl"
-	if len(os.Args) > 1 {
-		journalfile = os.Args[1]
+	if len(args) > 0 {
+		journalfile = args[0]
 	}
 	content := ""
 	file, err := os.OpenFile(journalfile, os.O_RDWR|os.O_APPEND, os.ModePerm)
@@ -192,7 +197,16 @@ func main() {
 		content = string(contentRaw)
 	}
 	defer file.Close()
-
+	if *printMode {
+		fmt.Printf("%s\n", content)
+		return
+	}
+	if *appendMode != "" {
+		tstamp := time.Now().Format("2006/01/02 15:04")
+		stampedline := fmt.Sprintf("%s-%s\n", tstamp, *appendMode)
+		file.WriteString(stampedline)
+		return
+	}
 	ti := textinput.New()
 	ti.Placeholder = ""
 	ti.Focus()
