@@ -81,6 +81,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.textInput, cmd = m.textInput.Update(msg)
 				m.content = m.content + stampedline
 				m.viewport.SetContent(m.content)
+				m.viewport.GotoBottom()
 
 			}
 		default:
