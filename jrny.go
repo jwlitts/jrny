@@ -81,6 +81,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				m.textInput, cmd = m.textInput.Update(msg)
 				m.content = m.content + stampedline
+				m.content = wordwrap.String(m.content, m.viewport.Width-4)
 				m.viewport.SetContent(m.content)
 				m.viewport.GotoBottom()
 
@@ -103,6 +104,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
 			m.viewport.YPosition = headerHeight
 			m.viewport.HighPerformanceRendering = useHighPerformanceRenderer
+			m.content = wordwrap.String(m.content, m.viewport.Width-4)
 			m.viewport.SetContent(m.content)
 			m.ready = true
 			// log.Printf("%+v", m.viewport.KeyMap)
@@ -143,7 +145,7 @@ func (m model) View() string {
 	if !m.ready {
 		return "\n  Initializing..."
 	}
-	return fmt.Sprintf("%s\n%s\n%s", m.headerView(), wordwrap.String(m.viewport.View(), m.viewport.Width-4), m.footerView())
+	return fmt.Sprintf("%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView())
 }
 
 func (m model) headerView() string {
@@ -212,6 +214,7 @@ func main() {
 	ti := textinput.New()
 	ti.Placeholder = ""
 	ti.Focus()
+
 	m := model{content: string(content), textInput: ti, journal: file, filename: journalfile}
 
 	p := tea.NewProgram(m)
